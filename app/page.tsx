@@ -8,10 +8,13 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-lg border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="flex justify-between items-center h-20">
-            <div className="flex-shrink-0">
-              <span className="text-3xl font-extrabold tracking-tight text-slate-900">
-                Atenia
-              </span>
+            {/* Logo de Atenia (Imagen) */}
+            <div className="flex-shrink-0 flex items-center">
+              <img
+                src="/images/logo-atenia.png"
+                alt="Logo Atenia"
+                className="h-20 w-auto object-contain"
+              />
             </div>
             <div className="ml-auto">
               <a
@@ -37,69 +40,102 @@ export default function LandingPage() {
                 Atenia es el primer asistente de Inteligencia Artificial para WhatsApp que contesta en 2 segundos, filtra a los proveedores y agenda mesas 24/7. Cero estrés. Cero comisiones por cubierto.
               </p>
               <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
-                <a
-                  href="#"
-                  className="w-full sm:w-auto inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-all duration-300 shadow-xl hover:shadow-violet-600/40 hover:-translate-y-1"
-                >
-                  📲 Probar la demo en vivo por WhatsApp
-                </a>
+                <div className="flex flex-col sm:flex-row justify-center items-center gap-6 relative">
+                  {/* Efecto de resplandor (Glow) animado detrás del botón */}
+                  <div className="absolute inset-0 bg-violet-600 rounded-lg blur-xl opacity-40 animate-pulse"></div>
+                  <a
+                    href="#"
+                    className="relative w-full sm:w-auto inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-all duration-300 shadow-xl hover:-translate-y-1"
+                  >
+                    📲 Probar la demo en vivo por WhatsApp
+                  </a>
+                </div>
               </div>
             </div>
           </div>
           {/* Elementos decorativos asimétricos estilo Electric AI */}
           <div className="absolute top-0 right-0 -translate-y-20 translate-x-1/3 opacity-20 pointer-events-none">
-             <div className="w-[40rem] h-[40rem] bg-violet-500 rounded-full blur-[100px]"></div>
+            <div className="w-[40rem] h-[40rem] bg-violet-500 rounded-full blur-[100px]"></div>
           </div>
           <div className="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/3 opacity-10 pointer-events-none">
-             <div className="w-[30rem] h-[30rem] bg-indigo-600 rounded-full blur-[100px]"></div>
+            <div className="w-[30rem] h-[30rem] bg-indigo-600 rounded-full blur-[100px]"></div>
           </div>
         </section>
 
-        {/* 3. Sección "Agitación del Dolor" */}
-        <section className="py-32 bg-white">
-          <div className="max-w-7xl mx-auto px-6 lg:px-12">
-            <div className="text-center mb-20 max-w-4xl mx-auto">
-              <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 leading-tight">
-                El caos del teléfono te está costando clientes (y tranquilidad).
+        {/* 3. Sección "Agitación del Dolor" - Diseño Innovador "Línea del Caos" */}
+        <section className="py-32 bg-white relative overflow-hidden">
+          <div className="max-w-5xl mx-auto px-6 lg:px-12 relative z-10">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 leading-tight max-w-3xl mx-auto">
+                El caos de WhatsApp te está costando mesas (y salud mental).
               </h2>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-              {/* Tarjeta 1 */}
-              <div className="bg-white rounded-2xl p-10 border border-gray-100 shadow-lg hover:shadow-2xl hover:shadow-violet-900/5 transition-all duration-300 relative overflow-hidden group">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-600 to-indigo-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-                <div className="w-16 h-16 bg-violet-50 rounded-2xl flex items-center justify-center mb-8">
-                  <TrendingDown className="w-8 h-8 text-violet-600" />
+
+            {/* Contenedor de la línea de tiempo asimétrica */}
+            <div className="relative border-l-4 border-violet-100 ml-4 md:ml-0 md:border-none space-y-20 md:space-y-32">
+
+              {/* Elemento 1 */}
+              <div className="relative flex flex-col md:flex-row items-center justify-between group pl-8 md:pl-0">
+                {/* Punto central (solo visible en desktop) */}
+                <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-violet-600 shadow-[0_0_20px_rgba(124,58,237,0.5)] z-20 group-hover:scale-150 transition-transform duration-300"></div>
+                {/* Línea vertical central (solo desktop) */}
+                <div className="hidden md:block absolute left-1/2 -translate-x-1/2 top-4 bottom-[-130px] w-1 bg-gradient-to-b from-violet-600/20 to-transparent z-10"></div>
+
+                <div className="md:w-[45%] md:text-right pr-0 md:pr-12 relative">
+                  {/* Punto móvil */}
+                  <div className="md:hidden absolute -left-[38px] top-6 w-4 h-4 rounded-full bg-violet-600 shadow-[0_0_10px_rgba(124,58,237,0.5)] z-20"></div>
+                  <h3 className="text-3xl font-extrabold text-slate-900 mb-4 flex items-center md:justify-end gap-3">
+                    <TrendingDown className="w-8 h-8 text-violet-600 md:order-last" />
+                    El Viernes a las 21:00hs
+                  </h3>
+                  <p className="text-xl text-slate-600 leading-relaxed">
+                    El salón está lleno, los camareros corren. El móvil del local vibra 15 veces. Nadie puede contestar. **Son 15 reservas perdidas** que se fueron a la competencia.
+                  </p>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">Reservas Perdidas</h3>
-                <p className="text-lg text-slate-600 leading-relaxed font-medium">
-                  ¿Cuántas mesas pierdes a la semana porque nadie pudo mirar el móvil durante el pico del servicio?
-                </p>
+                <div className="md:w-[45%] hidden md:block opacity-10 group-hover:opacity-100 transition-opacity duration-500">
+                  <span className="text-8xl font-black text-violet-600/20">01</span>
+                </div>
               </div>
 
-              {/* Tarjeta 2 */}
-              <div className="bg-white rounded-2xl p-10 border border-gray-100 shadow-lg hover:shadow-2xl hover:shadow-violet-900/5 transition-all duration-300 relative overflow-hidden group">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-600 to-indigo-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-                <div className="w-16 h-16 bg-violet-50 rounded-2xl flex items-center justify-center mb-8">
-                  <Clock className="w-8 h-8 text-violet-600" />
+              {/* Elemento 2 */}
+              <div className="relative flex flex-col md:flex-row-reverse items-center justify-between group pl-8 md:pl-0">
+                <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-violet-600 shadow-[0_0_20px_rgba(124,58,237,0.5)] z-20 group-hover:scale-150 transition-transform duration-300"></div>
+                <div className="hidden md:block absolute left-1/2 -translate-x-1/2 top-4 bottom-[-130px] w-1 bg-gradient-to-b from-violet-600/20 to-transparent z-10"></div>
+
+                <div className="md:w-[45%] md:text-left pl-0 md:pl-12 relative">
+                  <div className="md:hidden absolute -left-[38px] top-6 w-4 h-4 rounded-full bg-violet-600 shadow-[0_0_10px_rgba(124,58,237,0.5)] z-20"></div>
+                  <h3 className="text-3xl font-extrabold text-slate-900 mb-4 flex items-center gap-3">
+                    <Clock className="w-8 h-8 text-violet-600" />
+                    El Tiempo Muerto
+                  </h3>
+                  <p className="text-xl text-slate-600 leading-relaxed">
+                    ¿Cuánto le pagas a tu encargado por hora? ¿Y cuánto de ese tiempo lo pasa tecleando "Sí, tenemos sitio" o "La carta está en el perfil"? Es **dinero que se escurre** en tareas mecánicas.
+                  </p>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">Tiempo de tu Equipo</h3>
-                <p className="text-lg text-slate-600 leading-relaxed font-medium">
-                  ¿Tus camareros pierden tiempo valioso tecleando mensajes en lugar de atender el salón?
-                </p>
+                <div className="md:w-[45%] text-right hidden md:block opacity-10 group-hover:opacity-100 transition-opacity duration-500">
+                  <span className="text-8xl font-black text-violet-600/20">02</span>
+                </div>
               </div>
 
-              {/* Tarjeta 3 */}
-              <div className="bg-white rounded-2xl p-10 border border-gray-100 shadow-lg hover:shadow-2xl hover:shadow-violet-900/5 transition-all duration-300 relative overflow-hidden group">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-600 to-indigo-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-                <div className="w-16 h-16 bg-violet-50 rounded-2xl flex items-center justify-center mb-8">
-                  <Moon className="w-8 h-8 text-violet-600" />
+              {/* Elemento 3 */}
+              <div className="relative flex flex-col md:flex-row items-center justify-between group pl-8 md:pl-0">
+                <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-violet-600 shadow-[0_0_20px_rgba(124,58,237,0.5)] z-20 group-hover:scale-150 transition-transform duration-300"></div>
+
+                <div className="md:w-[45%] md:text-right pr-0 md:pr-12 relative">
+                  <div className="md:hidden absolute -left-[38px] top-6 w-4 h-4 rounded-full bg-violet-600 shadow-[0_0_10px_rgba(124,58,237,0.5)] z-20"></div>
+                  <h3 className="text-3xl font-extrabold text-slate-900 mb-4 flex items-center md:justify-end gap-3">
+                    <Moon className="w-8 h-8 text-violet-600 md:order-last" />
+                    Las 3 de la Mañana
+                  </h3>
+                  <p className="text-xl text-slate-600 leading-relaxed">
+                    El cliente moderno quiere reservar cuando se acuerda, no en tu horario de atención. Si no le das una respuesta inmediata, **busca otro lugar en Google Maps**.
+                  </p>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-4">Fuera de Horario</h3>
-                <p className="text-lg text-slate-600 leading-relaxed font-medium">
-                  ¿Harto de peticiones a las 3 de la mañana o de lidiar con mensajes de proveedores mezclados con clientes?
-                </p>
+                <div className="md:w-[45%] hidden md:block opacity-10 group-hover:opacity-100 transition-opacity duration-500">
+                  <span className="text-8xl font-black text-violet-600/20">03</span>
+                </div>
               </div>
+
             </div>
           </div>
         </section>
@@ -112,7 +148,7 @@ export default function LandingPage() {
                 <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-12 leading-tight">
                   Delega tu WhatsApp en el recepcionista perfecto.
                 </h2>
-                
+
                 <div className="space-y-12">
                   <div className="flex gap-6">
                     <div className="flex-shrink-0">
@@ -163,48 +199,59 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="w-full lg:w-1/2 relative">
-                 {/* Rectángulo decorativo eléctrico */}
-                 <div className="relative w-full max-w-lg mx-auto aspect-[4/5] bg-white rounded-3xl shadow-2xl shadow-violet-900/10 border border-gray-100 overflow-hidden">
-                    <div className="absolute top-0 inset-x-0 h-20 bg-slate-900 flex items-center px-8">
-                      <div className="w-10 h-10 rounded-full bg-slate-700 mr-4"></div>
-                      <div className="space-y-3 flex-1">
-                         <div className="h-3 bg-slate-700 rounded w-1/3"></div>
-                         <div className="h-3 bg-slate-700 rounded w-1/4"></div>
+                {/* Interfaz de Chat Real simulada */}
+                <div className="relative w-full max-w-lg mx-auto aspect-[4/5] bg-[#EFEAE2] rounded-3xl shadow-2xl shadow-violet-900/20 border border-gray-200 overflow-hidden flex flex-col">
+                  {/* Header del Chat */}
+                  <div className="h-16 bg-[#075E54] flex items-center px-6 shadow-md z-10">
+                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#075E54] font-bold text-xl mr-4 shadow-sm">
+                      A
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-white font-bold text-lg leading-tight">Atenia Asistente</span>
+                      <span className="text-white/80 text-xs">en línea</span>
+                    </div>
+                  </div>
+                  {/* Cuerpo del Chat (Mensajes) */}
+                  <div className="flex-1 p-6 space-y-4 overflow-hidden relative">
+                    {/* Fondo clásico de WhatsApp con opacidad */}
+                    <div className="absolute inset-0 opacity-5 bg-[url('https://i.pinimg.com/originals/8c/98/99/8c98994518b575bfd8c949e91d20548b.jpg')] bg-cover mix-blend-multiply pointer-events-none"></div>
+
+                    {/* Mensaje Cliente */}
+                    <div className="flex justify-end relative z-10">
+                      <div className="bg-[#DCF8C6] text-slate-800 rounded-2xl rounded-tr-sm px-4 py-2 max-w-[85%] shadow-sm text-[15px] leading-snug">
+                        Hola, quería ver si tienen lugar para cenar 2 personas esta noche.
+                        <span className="text-[10px] text-slate-500 float-right mt-2 ml-3">20:14</span>
                       </div>
                     </div>
-                    <div className="p-8 pt-32 space-y-6">
-                       <div className="flex justify-end">
-                          <div className="bg-gray-100 rounded-3xl rounded-tr-md p-5 max-w-[80%]">
-                             <div className="h-3 bg-gray-300 rounded w-32 mb-3"></div>
-                             <div className="h-3 bg-gray-300 rounded w-40"></div>
-                          </div>
-                       </div>
-                       <div className="flex justify-start">
-                          <div className="bg-violet-600 text-white rounded-3xl rounded-tl-md p-5 max-w-[80%] shadow-lg shadow-violet-600/20">
-                             <div className="h-3 bg-white/40 rounded w-48 mb-3"></div>
-                             <div className="h-3 bg-white/40 rounded w-24"></div>
-                          </div>
-                       </div>
-                       <div className="flex justify-end">
-                          <div className="bg-gray-100 rounded-3xl rounded-tr-md p-5 max-w-[80%] flex items-center">
-                             <Mic className="w-5 h-5 text-gray-500 mr-3" />
-                             <div className="h-1.5 bg-gray-300 rounded w-20 mx-1"></div>
-                             <div className="h-3 bg-gray-400 rounded-full w-2.5 mx-1"></div>
-                             <div className="h-4 bg-gray-400 rounded-full w-2.5 mx-1"></div>
-                             <div className="h-1.5 bg-gray-300 rounded w-10 mx-1"></div>
-                          </div>
-                       </div>
-                       <div className="flex justify-start">
-                          <div className="bg-violet-600 text-white rounded-3xl rounded-tl-md p-5 max-w-[80%] shadow-lg shadow-violet-600/20">
-                             <div className="h-3 bg-white/40 rounded w-56 mb-3"></div>
-                             <div className="h-3 bg-white/40 rounded w-32"></div>
-                          </div>
-                       </div>
+
+                    {/* Mensaje Atenia */}
+                    <div className="flex justify-start relative z-10">
+                      <div className="bg-white text-slate-800 rounded-2xl rounded-tl-sm px-4 py-2 max-w-[85%] shadow-sm border border-gray-100 text-[15px] leading-snug">
+                        ¡Hola! Qué gusto saludarte. 👋 Sí, tenemos disponibilidad. ¿A qué hora les gustaría venir?
+                        <span className="text-[10px] text-slate-500 float-right mt-2 ml-3">20:14</span>
+                      </div>
                     </div>
-                 </div>
-                 <div className="absolute -z-10 top-1/2 left-1/2 w-[30rem] h-[30rem] bg-violet-400/20 rounded-full blur-[100px] -translate-y-1/2 -translate-x-1/2"></div>
+
+                    {/* Mensaje Cliente */}
+                    <div className="flex justify-end relative z-10">
+                      <div className="bg-[#DCF8C6] text-slate-800 rounded-2xl rounded-tr-sm px-4 py-2 max-w-[85%] shadow-sm text-[15px] leading-snug">
+                        A las 21:30 está bien. A nombre de Lucas.
+                        <span className="text-[10px] text-slate-500 float-right mt-2 ml-3">20:15</span>
+                      </div>
+                    </div>
+
+                    {/* Mensaje Atenia */}
+                    <div className="flex justify-start relative z-10">
+                      <div className="bg-white text-slate-800 rounded-2xl rounded-tl-sm px-4 py-2 max-w-[85%] shadow-sm border border-gray-100 text-[15px] leading-snug">
+                        ¡Excelente Lucas! 🥂 Tu reserva para 2 personas hoy a las 21:30 está confirmada. ¡Los esperamos en La Playa!
+                        <span className="text-[10px] text-slate-500 float-right mt-2 ml-3">20:15</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -z-10 top-1/2 left-1/2 w-[30rem] h-[30rem] bg-violet-400/20 rounded-full blur-[100px] -translate-y-1/2 -translate-x-1/2"></div>
               </div>
             </div>
           </div>
@@ -229,9 +276,13 @@ export default function LandingPage() {
               <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-10 leading-tight">
                 Un recepcionista incansable por una fracción de lo que imaginas.
               </h2>
-              <div className="inline-flex items-center justify-center px-8 py-4 bg-white rounded-2xl border border-gray-200 shadow-lg">
-                <span className="text-lg font-medium text-slate-900">
-                  ⚙️ <span className="font-extrabold text-violet-600">Setup e Instalación a Medida:</span> 490€ (Pago único). Incluye configuración de IA, horarios, reglas y visita presencial.
+              <div className="inline-flex items-center justify-center px-8 py-5 bg-slate-900 rounded-2xl shadow-xl shadow-slate-900/20 w-full max-w-3xl transform transition-transform hover:scale-[1.02]">
+                <span className="text-lg font-medium text-white flex flex-col md:flex-row items-center gap-2">
+                  <span className="flex items-center gap-2">
+                    <span className="bg-violet-600 p-2 rounded-lg">⚙️</span>
+                    <span className="font-extrabold text-violet-400">Setup Inicial a Medida:</span>
+                  </span>
+                  <span>490€ (Pago único). Incluye configuración total, reglas y vinculación.</span>
                 </span>
               </div>
             </div>
@@ -343,7 +394,7 @@ export default function LandingPage() {
             >
               👉 Hablar con Atenia ahora
             </a>
-            
+
             <div className="w-full max-w-4xl border-t border-gray-100 pt-10 flex flex-col md:flex-row justify-between items-center gap-6 text-base text-slate-500 font-medium">
               <p>&copy; {new Date().getFullYear()} Atenia. Todos los derechos reservados.</p>
               <div className="flex space-x-8">

@@ -12,13 +12,6 @@ const config: Config = {
         indigo: {
           950: "#1A243B",
         },
-        terracotta: {
-          500: "#D97757",
-          600: "#c26547",
-        },
-        gold: {
-          500: "#C5A059",
-        },
       },
     },
   },
