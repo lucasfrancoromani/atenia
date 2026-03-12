@@ -210,7 +210,7 @@ export default function LandingPage() {
                         <img
                           src="/images/icono-A.png"
                           alt="Entiende mensajes"
-                          className="w-full h-full object-contain relative z-10 drop-shadow-[0_8px_15px_rgba(124,58,237,0.3)]"
+                          className="w-full h-full object-contain relative z-10 drop-shadow-[0_8px_15px_rgba(124,58,237,0.3)] will-change-transform transform-gpu"
                         />
                       </div>
                     </div>
@@ -231,8 +231,8 @@ export default function LandingPage() {
                         <div className="absolute inset-0 bg-indigo-400/20 blur-xl rounded-full"></div>
                         <img
                           src="/images/icono-escudo.png"
-                          alt="Filtro de contactos"
-                          className="w-full h-full object-contain relative z-10 drop-shadow-[0_8px_15px_rgba(99,102,241,0.3)]"
+                          alt="Entiende mensajes"
+                          className="w-full h-full object-contain relative z-10 drop-shadow-[0_8px_15px_rgba(124,58,237,0.3)] will-change-transform transform-gpu"
                         />
                       </div>
                     </div>
@@ -253,8 +253,8 @@ export default function LandingPage() {
                         <div className="absolute inset-0 bg-indigo-400/20 blur-xl rounded-full"></div>
                         <img
                           src="/images/icono-manos.png"
-                          alt="Trabajo en equipo"
-                          className="w-full h-full object-contain relative z-10 drop-shadow-[0_8px_15px_rgba(99,102,241,0.3)]"
+                          alt="Entiende mensajes"
+                          className="w-full h-full object-contain relative z-10 drop-shadow-[0_8px_15px_rgba(124,58,237,0.3)] will-change-transform transform-gpu"
                         />
                       </div>
                     </div>
