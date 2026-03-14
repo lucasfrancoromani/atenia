@@ -32,7 +32,7 @@ export default function LandingPage() {
             {/* Botón CTA y Hamburguesa */}
             <div className="ml-auto z-10 flex items-center gap-4">
               <a
-                href="#"
+                href="https://wa.me/34643310708?text=Hola%20Atenia!%20Vengo%20a%20probar%20la%20demo.%20Quiero%20hacer%20una%20reserva"
                 className="hidden sm:inline-flex items-center justify-center px-8 py-3 text-sm md:text-base font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors duration-300 shadow-md hover:shadow-xl"
               >
                 Probar Demo
@@ -58,7 +58,7 @@ export default function LandingPage() {
             <a href="#casos" onClick={() => setIsMobileMenuOpen(false)} className="text-base font-bold text-slate-600 hover:text-violet-600 uppercase tracking-widest border-b border-gray-50 pb-4">Casos reales</a>
             <a href="#planes" onClick={() => setIsMobileMenuOpen(false)} className="text-base font-bold text-slate-600 hover:text-violet-600 uppercase tracking-widest border-b border-gray-50 pb-4">Planes</a>
             <a
-              href="#"
+              href="https://wa.me/34643310708?text=Hola%20Atenia!%20Vengo%20a%20probar%20la%20demo.%20Quiero%20hacer%20una%20reserva"
               className="inline-flex items-center justify-center w-full px-8 py-4 text-base font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors duration-300 shadow-md mt-2"
             >
               Probar Demo
@@ -84,7 +84,7 @@ export default function LandingPage() {
                   {/* Efecto de resplandor (Glow) animado detrás del botón */}
                   <div className="absolute inset-0 bg-violet-600 rounded-lg blur-xl opacity-40 animate-pulse"></div>
                   <a
-                    href="#"
+                    href="https://wa.me/34643310708?text=Hola%20Atenia!%20Vengo%20a%20probar%20la%20demo.%20Quiero%20hacer%20una%20reserva"
                     className="relative w-full sm:w-auto inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-white bg-violet-600 hover:bg-violet-500 rounded-lg transition-all duration-300 shadow-xl hover:-translate-y-1"
                   >
                     Probar la demo en vivo por WhatsApp
@@ -587,7 +587,7 @@ export default function LandingPage() {
                   <p className="text-violet-300 font-medium">Configuramos el "cerebro" de Atenia presencialmente en tu local.</p>
                 </div>
                 <a
-                  href="https://wa.me/34XXXXXXXXX?text=Hola%20Atenia,%20quiero%20coordinar%20una%20visita%20para%20presupuesto"
+                  href="https://wa.me/34643310708?text=Hola%20Atenia!%20Vengo%20a%20probar%20la%20demo.%20Quiero%20hacer%20una%20reserva"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full md:w-auto px-8 py-4 text-lg font-bold text-white bg-violet-600 hover:bg-violet-500 rounded-xl transition-all duration-300 shadow-lg hover:shadow-violet-600/40 hover:-translate-y-1 whitespace-nowrap"
@@ -608,7 +608,7 @@ export default function LandingPage() {
               Deja que Atenia atienda a tu próximo cliente.
             </h3>
             <a
-              href="#"
+              href="https://wa.me/34643310708?text=Hola%20Atenia!%20Vengo%20a%20probar%20la%20demo.%20Quiero%20hacer%20una%20reserva"
               className="inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-all duration-300 shadow-xl hover:shadow-violet-600/40 hover:-translate-y-1 mb-16"
             >
               Hablar con Atenia ahora
