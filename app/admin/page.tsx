@@ -19,6 +19,7 @@ type Reserva = {
   estado: string;
   nombre?: string;
   mesa_id?: number;
+  zona_id?: string;
 };
 
 const HORAS = {
@@ -103,20 +104,54 @@ export default function AdminPanel() {
     .filter(r => r.estado === 'confirmada' || r.estado === 'pendiente')
     .filter(r => turno === 'mediodia' ? isMediodia(r.hora_inicio) : !isMediodia(r.hora_inicio));
 
-  // Asignación de mesa_id dinámico fallbacks
-  const cloneVisuales = [...mesasVisuales];
-  const reservasAsignadas = reservasDelTurno.map((res, index) => {
-    if (res.mesa_id) return res;
-    const mesaLibreIndex = cloneVisuales.findIndex(m => m.capacidad >= res.personas);
-    if (mesaLibreIndex !== -1) return { ...res, mesa_id: cloneVisuales.splice(mesaLibreIndex, 1)[0].id };
-    return { ...res, mesa_id: mesasVisuales[index % mesasVisuales.length]?.id || 1 };
+  // Asignación Dinámica Multimesa (UX Frontend Tetris)
+  let cloneVisuales = [...mesasVisuales];
+  const mapeoReservas: { res: Reserva, mesaIds: number[] }[] = [];
+
+  reservasDelTurno.forEach(res => {
+    let pRes = res.personas;
+    let asignadas: number[] = [];
+
+    // Priorizamos mesa_id original si existe
+    if (res.mesa_id) {
+       asignadas.push(res.mesa_id);
+       let mCap = mesasVisuales.find(m => m.id === res.mesa_id)?.capacidad || 0;
+       pRes -= mCap;
+       cloneVisuales = cloneVisuales.filter(m => m.id !== res.mesa_id);
+    }
+
+    // Si aún sobran personas (grupo grande o IA no asignó mesa_id)
+    while(pRes > 0 && cloneVisuales.length > 0) {
+       const zIdTarget = res.zona_id || (res.mesa_id ? mesasVisuales.find(m => m.id === res.mesa_id)?.zona.id : null);
+       let candidatas = cloneVisuales.filter(m => !zIdTarget || m.zona.id === zIdTarget);
+       if(candidatas.length === 0) candidatas = cloneVisuales;
+
+       candidatas.sort((a,b) => a.capacidad - b.capacidad);
+       let elegida = candidatas.find(m => m.capacidad >= pRes) || candidatas[candidatas.length - 1];
+
+       if(elegida) {
+           asignadas.push(elegida.id);
+           pRes -= elegida.capacidad;
+           cloneVisuales = cloneVisuales.filter(m => m.id !== elegida.id);
+       } else {
+           break;
+       }
+    }
+    
+    // Solo asignamos mesa si realmente se procesó
+    const fallbackId = asignadas.length > 0 ? asignadas[0] : (mesasVisuales[0]?.id || 1);
+    mapeoReservas.push({ res: { ...res, mesa_id: res.mesa_id || fallbackId }, mesaIds: asignadas });
   });
 
-  const getReservasEnMesa = (resId: number) => reservasAsignadas.filter(r => r.mesa_id === resId);
+  const reservasAsignadas = mapeoReservas.map(m => m.res);
+
+  const getReservasEnMesa = (resId: number) => {
+    return mapeoReservas.filter(m => m.mesaIds.includes(resId)).map(m => m.res);
+  };
 
   // Stats
-  const mesasOcupadasIds = new Set(reservasAsignadas.map(r => r.mesa_id).filter(Boolean));
-  const paxDelTurno = reservasAsignadas.reduce((sum, r) => sum + (r.personas || 0), 0);
+  const mesasOcupadasIds = new Set(mapeoReservas.flatMap(m => m.mesaIds));
+  const paxDelTurno = reservasDelTurno.reduce((sum, r) => sum + (r.personas || 0), 0);
   const totalMesas = mesasVisuales.length;
   const ocupadas = mesasOcupadasIds.size;
   const libres = totalMesas - ocupadas;
@@ -142,6 +177,8 @@ export default function AdminPanel() {
     const [h, m] = modalForm.hora_inicio.split(':');
     const hora_fin = `${(parseInt(h) + 2).toString().padStart(2, '0')}:${m}`;
 
+    const zonaIdCorrecta = getZonaDeMesa(modalForm.mesa_id)?.id || 'z1';
+
     const nuevaReserva = {
       nombre: modalForm.nombre,
       personas: modalForm.personas,
@@ -149,7 +186,8 @@ export default function AdminPanel() {
       hora_fin: hora_fin,
       fecha: hoy,
       estado: 'confirmada',
-      mesa_id: modalForm.mesa_id
+      mesa_id: modalForm.mesa_id,
+      zona_id: zonaIdCorrecta
     };
 
     const { data: inserted, error } = await supabase.from('reservas').insert([nuevaReserva]).select('*');
