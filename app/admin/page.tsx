@@ -25,7 +25,7 @@ const HORAS = {
   mediodia: ['13:00', '13:30', '14:00', '14:30', '15:00', '15:30'],
   noche: ['20:00', '20:30', '21:00', '21:30', '22:00', '22:30', '23:00']
 };
-const ZONA_COLORS = ['#534AB7','#1D9E75','#D85A30','#BA7517','#185FA5','#993556','#3B6D11','#5F5E5A'];
+const ZONA_COLORS = ['#534AB7', '#1D9E75', '#D85A30', '#BA7517', '#185FA5', '#993556', '#3B6D11', '#5F5E5A'];
 
 export default function AdminPanel() {
   const [zonas, setZonas] = useState<ZonaConfig[]>([]);
@@ -72,7 +72,7 @@ export default function AdminPanel() {
           const mesasMigradas: MesaFisica[] = [];
           let mId = 1;
           inv.forEach((item: any) => {
-            for(let i=0; i<item.cantidad; i++) mesasMigradas.push({ id: mId++, capacidad: item.capacidad });
+            for (let i = 0; i < item.cantidad; i++) mesasMigradas.push({ id: mId++, capacidad: item.capacidad });
           });
           setZonas([{ id: 'z_principal', nombre: 'Salón Principal', color: '#534AB7', mesas: mesasMigradas }]);
         } else {
@@ -173,7 +173,7 @@ export default function AdminPanel() {
   };
 
   // UI Helpers Sillas
-  const renderHorizontalChairs = (count: number, position: 'top'|'bottom', sillaHex: string) => {
+  const renderHorizontalChairs = (count: number, position: 'top' | 'bottom', sillaHex: string) => {
     if (count <= 0) return null;
     return (
       <div className={`absolute ${position === 'top' ? '-top-1.5' : '-bottom-1.5'} left-0 w-full flex justify-evenly px-2`}>
@@ -182,7 +182,7 @@ export default function AdminPanel() {
     );
   };
 
-  const renderVerticalChairs = (count: number, position: 'left'|'right', sillaHex: string) => {
+  const renderVerticalChairs = (count: number, position: 'left' | 'right', sillaHex: string) => {
     if (count <= 0) return null;
     return (
       <div className={`absolute ${position === 'left' ? '-left-1.5' : '-right-1.5'} top-0 h-full flex flex-col justify-evenly py-2`}>
@@ -323,18 +323,19 @@ export default function AdminPanel() {
                 <div className="flex-1 flex flex-col min-h-0">
                   <h3 className="text-sm font-bold text-gray-800 mb-3 pb-2 border-b border-gray-100">Reservas Activas</h3>
                   <div className="flex-1 overflow-y-auto pr-1 space-y-2">
-                    {reservasAsignadas.filter(r => zonaFiltro === 'todas' || getZonaDeMesa(r.mesa_id || 0)?.id === zonaFiltro).length === 0 ? <p className="text-xs text-gray-400 text-center py-6">Sin reservas.</p> 
-                    : reservasAsignadas.filter(r => zonaFiltro === 'todas' || getZonaDeMesa(r.mesa_id || 0)?.id === zonaFiltro).map(r => {
-                      const zona = getZonaDeMesa(r.mesa_id || 0);
-                      return (
-                      <div key={r.id} onClick={() => setSelectedTableId(r.mesa_id || null)} className={`p-3 rounded-xl cursor-pointer border transition-all flex flex-col gap-1 ${selectedTableId === r.mesa_id ? 'bg-[#EEEDFE] border-[#534AB7]' : 'bg-white border-gray-200 hover:border-gray-300 shadow-sm'}`}>
-                        <div className="flex justify-between items-start">
-                          <p className="text-sm font-semibold text-gray-900 truncate">{r.nombre}</p>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap opacity-80" style={{ backgroundColor: zona?.color ? `${zona.color}20` : '#e2e8f0', color: zona?.color }}>M {r.mesa_id}</span>
-                        </div>
-                        <p className="text-[11px] text-gray-500">{r.personas}pax • {r.hora_inicio} • {zona?.nombre}</p>
-                      </div>
-                    )})}
+                    {reservasAsignadas.filter(r => zonaFiltro === 'todas' || getZonaDeMesa(r.mesa_id || 0)?.id === zonaFiltro).length === 0 ? <p className="text-xs text-gray-400 text-center py-6">Sin reservas.</p>
+                      : reservasAsignadas.filter(r => zonaFiltro === 'todas' || getZonaDeMesa(r.mesa_id || 0)?.id === zonaFiltro).map(r => {
+                        const zona = getZonaDeMesa(r.mesa_id || 0);
+                        return (
+                          <div key={r.id} onClick={() => setSelectedTableId(r.mesa_id || null)} className={`p-3 rounded-xl cursor-pointer border transition-all flex flex-col gap-1 ${selectedTableId === r.mesa_id ? 'bg-[#EEEDFE] border-[#534AB7]' : 'bg-white border-gray-200 hover:border-gray-300 shadow-sm'}`}>
+                            <div className="flex justify-between items-start">
+                              <p className="text-sm font-semibold text-gray-900 truncate">{r.nombre}</p>
+                              <span className="text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap opacity-80" style={{ backgroundColor: zona?.color ? `${zona.color}20` : '#e2e8f0', color: zona?.color }}>M {r.mesa_id}</span>
+                            </div>
+                            <p className="text-[11px] text-gray-500">{r.personas}pax • {r.hora_inicio} • {zona?.nombre}</p>
+                          </div>
+                        )
+                      })}
                   </div>
                 </div>
               </div>
@@ -347,9 +348,9 @@ export default function AdminPanel() {
                       <div key={zona.id} className="border bg-white rounded-3xl overflow-hidden mb-8 shadow-sm" style={{ borderColor: `${zona.color}50` }}>
                         <div className="px-5 py-3 flex items-center justify-between" style={{ backgroundColor: `${zona.color}11`, borderBottom: `1px solid ${zona.color}30` }}>
                           <div className="flex items-center gap-2">
-                             <div className="w-4 h-4 rounded-full" style={{ backgroundColor: zona.color }}></div>
-                             <span className="font-bold text-gray-900">{zona.nombre}</span>
-                             <span className="text-xs text-gray-600 bg-white/50 px-2 py-0.5 rounded-md font-medium">{zona.mesas.length} mesas • {ocupadasZ} ocupadas</span>
+                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: zona.color }}></div>
+                            <span className="font-bold text-gray-900">{zona.nombre}</span>
+                            <span className="text-xs text-gray-600 bg-white/50 px-2 py-0.5 rounded-md font-medium">{zona.mesas.length} mesas • {ocupadasZ} ocupadas</span>
                           </div>
                           <button onClick={() => openModal(null, zona.id)} className="text-[11px] font-bold px-3 py-1.5 rounded-lg border bg-white transition-colors" style={{ color: zona.color, borderColor: `${zona.color}50` }}>+ Reservar en Zona</button>
                         </div>
@@ -365,18 +366,30 @@ export default function AdminPanel() {
                             const mesaAnchoRem = Math.max(4.5, 3.5 + (Math.max(sillasArriba, sillasAbajo) * 1.5));
 
                             return (
-                              <div key={mesa.id} onClick={() => setSelectedTableId(selectedTableId === mesa.id ? null : mesa.id)} className={`relative h-20 border-[2.5px] rounded-2xl flex flex-col items-center justify-center shadow-sm hover:scale-105 transition-all cursor-pointer ${estado.bg} ${estado.borderClass} hover:shadow-md select-none`} style={{ width: `${mesaAnchoRem}rem`, borderColor: estado.borderHex }}>
+                              <div key={mesa.id} onClick={() => setSelectedTableId(selectedTableId === mesa.id ? null : mesa.id)} className={`relative z-10 hover:z-40 h-20 border-[2.5px] rounded-2xl flex flex-col items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:scale-[1.03] transition-all cursor-pointer ${estado.bg} ${estado.borderClass} hover:shadow-xl select-none`} style={{ width: `${mesaAnchoRem}rem`, borderColor: estado.borderHex }}>
                                 <span className={`font-bold text-xl leading-none ${estado.textClass}`} style={{ color: estado.textClass === 'text-gray-800' ? '#333' : undefined }}>{mesa.id}</span>
                                 <span className={`font-medium text-[10px] leading-tight opacity-70 mt-0.5 ${estado.textClass}`} style={{ color: estado.textClass === 'text-gray-800' ? '#444' : undefined }}>{cap} pax</span>
-                                
+
                                 {resMesa.length > 0 && selectedTableId !== mesa.id && <div className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse z-10" />}
-                                
+
                                 {renderHorizontalChairs(sillasArriba, 'top', estado.sillaHex)}
                                 {renderHorizontalChairs(sillasAbajo, 'bottom', estado.sillaHex)}
                                 {renderVerticalChairs(sillasIzquierda, 'left', estado.sillaHex)}
                                 {renderVerticalChairs(sillasDerecha, 'right', estado.sillaHex)}
-                                
-                                {resMesa.length > 0 && <div className={`absolute -bottom-6 w-[200%] text-center ${estado.labelText || estado.textClass} text-[11px] font-bold truncate bg-white/50 backdrop-blur-sm rounded-md px-1`}>{resMesa[0].nombre} • {resMesa[0].hora_inicio}</div>}
+
+                                {resMesa.length > 0 && (
+                                  <div
+                                    onClick={(e) => { e.stopPropagation(); setSelectedTableId(mesa.id); }}
+                                    className={`group absolute -bottom-7 left-1/2 -translate-x-1/2 w-[140%] max-w-[110px] text-center ${estado.labelText || estado.textClass} text-[10px] font-bold bg-white shadow-sm border border-gray-200 rounded-md px-1.5 py-0.5 z-20 cursor-pointer flex items-center justify-center transition-colors hover:bg-gray-50`}
+                                  >
+                                    <span className="truncate w-full pointer-events-none">{resMesa[0].nombre} • {resMesa[0].hora_inicio}</span>
+                                    {/* Tooltip */}
+                                    <div className="hidden group-hover:flex absolute left-1/2 -translate-x-1/2 bottom-full mb-1.5 w-max max-w-[200px] flex-col items-center px-2.5 py-1.5 bg-gray-900 text-white text-[11px] rounded shadow-xl z-[100] pointer-events-none whitespace-normal leading-tight">
+                                      {resMesa[0].nombre} • {resMesa[0].hora_inicio}
+                                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             );
                           })}
@@ -386,34 +399,7 @@ export default function AdminPanel() {
                   })}
                 </div>
 
-                <div className="border-t border-gray-200 bg-white p-4 md:p-5 shadow-lg shrink-0 transition-opacity flex flex-col relative z-20">
-                  <h3 className="text-sm font-bold text-gray-800 mb-3 md:mb-4">{selectedTableId ? `Detalles de la Mesa ${selectedTableId}` : 'Detalles de la Mesa'}</h3>
-                  <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                    {!selectedTableId ? (
-                      <p className="text-gray-400 text-sm w-full text-center py-6 border-2 border-dashed border-gray-100 rounded-xl">Selecciona una mesa en el plano para ver sus detalles</p>
-                    ) : (getReservasEnMesa(selectedTableId).length === 0 ? (
-                      <div className="flex flex-col gap-3 w-full bg-green-50 rounded-xl border border-green-100 p-6 flex items-center justify-center flex-1">
-                        <p className="text-green-700 font-semibold mb-2">Mesa libre para el turno actual</p>
-                        <button onClick={() => openModal(selectedTableId)} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg text-sm shadow-sm transition-colors border border-transparent flex items-center gap-2">
-                          <Plus size={16}/> Reservar en la Mesa {selectedTableId}
-                        </button>
-                      </div>
-                    ) : (
-                      getReservasEnMesa(selectedTableId).map(r => (
-                        <div key={r.id} className="bg-gray-50 border border-gray-200 rounded-xl p-4 min-w-[240px] flex flex-col relative overflow-hidden">
-                          <div className="absolute top-0 left-0 w-1 h-full" style={{ backgroundColor: getZonaDeMesa(r.mesa_id || 0)?.color }}></div>
-                          <p className="font-bold text-gray-900 text-base ml-2">{r.nombre}</p>
-                          <p className="text-gray-500 text-sm mt-1 ml-2">{r.personas} personas</p>
-                          <p className="text-gray-500 text-sm ml-2">{r.fecha} a las {r.hora_inicio}</p>
-                          <div className="flex items-center gap-2 mt-auto pt-4 ml-2">
-                            <span className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-md">Confirmada</span>
-                            <button onClick={() => handleDeleteReserva(r.id)} className="ml-auto text-xs text-red-500 hover:text-red-700 hover:bg-red-50 font-bold px-3 py-1 rounded border border-red-200 transition-colors">Cancelar MESA</button>
-                          </div>
-                        </div>
-                      ))
-                    ))}
-                  </div>
-                </div>
+                {/* Panel bottom removed and replaced by modal */}
               </div>
             </div>
           </div>
@@ -427,7 +413,7 @@ export default function AdminPanel() {
                 <p className="text-gray-500 mt-1">Crea zonas, asígnale mesas, y ubica todas en tu plano.</p>
               </div>
               <button disabled={saving} onClick={handleSaveZonas} className="bg-[#3e1b55] hover:bg-[#2c133d] text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2 shadow-sm transition-colors disabled:opacity-50">
-                <Save size={18} /> {saving ? 'Guardando...' : 'Guardar y Reflejar en DB'}
+                <Save size={18} /> {saving ? 'Guardando...' : 'Guardar cambios'}
               </button>
             </div>
 
@@ -437,13 +423,13 @@ export default function AdminPanel() {
                   <div className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-gray-50 border-b gap-4" style={{ borderColor: `${zona.color}30` }}>
                     <div className="flex items-center gap-3 w-full md:w-auto">
                       <select value={zona.color} onChange={(e) => updateZona(zInd, 'color', e.target.value)} className="w-10 h-10 rounded-full border-2 border-white shadow-sm cursor-pointer appearance-none" style={{ backgroundColor: zona.color, color: 'transparent' }}>
-                         {ZONA_COLORS.map(c => <option key={c} value={c} style={{background: c}}>{c}</option>)}
+                        {ZONA_COLORS.map(c => <option key={c} value={c} style={{ background: c }}>{c}</option>)}
                       </select>
                       <input value={zona.nombre} onChange={(e) => updateZona(zInd, 'nombre', e.target.value)} className="font-bold text-lg md:text-xl bg-transparent border-b-2 border-transparent outline-none focus:border-gray-300 px-1 w-full md:w-auto" placeholder="Nombre Zona" />
                     </div>
-                    <button onClick={() => deleteZona(zInd)} className="text-red-400 hover:bg-red-50 p-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shrink-0 self-end md:self-auto"><Trash2 size={16}/> Eliminar Zona</button>
+                    <button onClick={() => deleteZona(zInd)} className="text-red-400 hover:bg-red-50 p-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 shrink-0 self-end md:self-auto"><Trash2 size={16} /> Eliminar Zona</button>
                   </div>
-                  
+
                   <div className="p-5 flex flex-wrap gap-4 items-stretch bg-white">
                     {zona.mesas.map((m, mInd) => (
                       <div key={m.id} className="border rounded-xl p-3 flex flex-col items-center gap-2 relative shadow-sm min-w-[90px] w-[100px]" style={{ borderColor: `${zona.color}40`, backgroundColor: `${zona.color}05` }}>
@@ -453,11 +439,11 @@ export default function AdminPanel() {
                           <input type="number" min="1" value={m.capacidad} onChange={(e) => updateMesaCap(zInd, mInd, Number(e.target.value))} className="w-12 border bg-white rounded-lg p-1.5 text-center font-bold text-gray-700 outline-none focus:ring-2 focus:ring-indigo-100" />
                           <span className="text-[10px] text-gray-500 font-semibold uppercase">Pax</span>
                         </div>
-                        <button onClick={() => deleteMesaFromZona(zInd, mInd)} className="absolute -top-2 -right-2 bg-white rounded-full p-1 text-red-400 shadow-sm border border-gray-200 hover:text-red-600 opacity-0 hover:opacity-100 transition-opacity group-hover:opacity-100 focus:opacity-100"><XCircle size={14}/></button>
+                        <button onClick={() => deleteMesaFromZona(zInd, mInd)} className="absolute -top-2 -right-2 bg-white rounded-full p-1 text-red-400 shadow-sm border border-gray-200 hover:text-red-600 opacity-0 hover:opacity-100 transition-opacity group-hover:opacity-100 focus:opacity-100"><XCircle size={14} /></button>
                       </div>
                     ))}
                     <button onClick={() => addMesaToZona(zInd)} className="border-2 border-dashed border-gray-300 rounded-xl px-4 flex flex-col items-center justify-center min-h-[90px] text-gray-400 hover:text-gray-600 hover:border-gray-400 hover:bg-gray-50 font-semibold text-xs gap-1 transition-colors">
-                      <Plus size={18}/><span>Añadir Mesa</span>
+                      <Plus size={18} /><span>Añadir Mesa</span>
                     </button>
                   </div>
                 </div>
@@ -477,7 +463,7 @@ export default function AdminPanel() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <div className="bg-gray-50 p-6 rounded-2xl shadow-sm border border-gray-200"><p className="text-gray-500 font-medium tracking-wide text-sm uppercase">Reservas Totales</p><p className="text-4xl font-black mt-2 text-[#3e1b55]">342</p></div>
               <div className="bg-gray-50 p-6 rounded-2xl shadow-sm border border-gray-200"><p className="text-gray-500 font-medium tracking-wide text-sm uppercase">Comensales Atendidos</p><p className="text-4xl font-black mt-2 text-indigo-600">830</p></div>
-              <div className="bg-gray-50 p-6 rounded-2xl shadow-sm border border-gray-200"><p className="text-gray-500 font-medium tracking-wide text-sm uppercase">Cancelaciones / No-shows</p><p className="text-4xl font-black mt-2 text-red-500">22</p></div>
+              <div className="bg-gray-50 p-6 rounded-2xl shadow-sm border border-gray-200"><p className="text-gray-500 font-medium tracking-wide text-sm uppercase">Cancelaciones</p><p className="text-4xl font-black mt-2 text-red-500">22</p></div>
             </div>
             <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200 h-[400px] flex flex-col">
               <h2 className="text-xl font-bold text-gray-900 mb-6">Actividad de la Semana Actual</h2>
@@ -509,22 +495,22 @@ export default function AdminPanel() {
               </div>
               <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-700 bg-white shadow-sm p-1.5 rounded-full border border-gray-200"><XCircle size={20} /></button>
             </div>
-            
+
             <form onSubmit={handleCreateReserva} className="p-5 md:p-6 space-y-5 overflow-y-auto">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 flex items-center justify-between">Nombre <span className="text-red-400">*</span></label>
-                  <input required placeholder="Ej. Juan Pérez" value={modalForm.nombre} onChange={(e) => setModalForm({...modalForm, nombre: e.target.value})} className="w-full text-sm font-medium p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#534AB7] focus:outline-none" />
+                  <input required placeholder="Ej. Juan Pérez" value={modalForm.nombre} onChange={(e) => setModalForm({ ...modalForm, nombre: e.target.value })} className="w-full text-sm font-medium p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#534AB7] focus:outline-none" />
                 </div>
                 <div>
                   <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Personas</label>
-                  <input type="number" min="1" max="20" required value={modalForm.personas} onChange={(e) => setModalForm({...modalForm, personas: Number(e.target.value)})} className="w-full text-sm font-medium p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#534AB7] focus:outline-none" />
+                  <input type="number" min="1" max="20" required value={modalForm.personas} onChange={(e) => setModalForm({ ...modalForm, personas: Number(e.target.value) })} className="w-full text-sm font-medium p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#534AB7] focus:outline-none" />
                 </div>
               </div>
 
               <div>
                 <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Hora</label>
-                <select value={modalForm.hora_inicio} onChange={(e) => setModalForm({...modalForm, hora_inicio: e.target.value})} className="w-full text-sm font-medium p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#534AB7] focus:outline-none bg-white">
+                <select value={modalForm.hora_inicio} onChange={(e) => setModalForm({ ...modalForm, hora_inicio: e.target.value })} className="w-full text-sm font-medium p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#534AB7] focus:outline-none bg-white">
                   {HORAS[turno].map(h => <option key={h} value={h}>{h} hs</option>)}
                 </select>
               </div>
@@ -541,14 +527,14 @@ export default function AdminPanel() {
                       return (
                         <button
                           key={m.id} type="button" disabled={estaOcupada}
-                          onClick={() => setModalForm({...modalForm, mesa_id: m.id})}
+                          onClick={() => setModalForm({ ...modalForm, mesa_id: m.id })}
                           className={`px-3 py-2 rounded-xl border text-sm transition-all text-left flex gap-1.5 items-center
-                            ${estaOcupada ? 'opacity-50 cursor-not-allowed bg-gray-50 border-gray-200 text-gray-500' 
-                            : isSelected ? 'bg-indigo-50 border-[#534AB7] text-[#3e1b55] font-bold shadow-sm ring-1 ring-[#534AB7]' 
-                            : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'}`}
+                            ${estaOcupada ? 'opacity-50 cursor-not-allowed bg-gray-50 border-gray-200 text-gray-500'
+                              : isSelected ? 'bg-indigo-50 border-[#534AB7] text-[#3e1b55] font-bold shadow-sm ring-1 ring-[#534AB7]'
+                                : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'}`}
                         >
                           <div className={`w-2 h-2 rounded-full ${estaOcupada ? 'opacity-50' : ''}`} style={{ backgroundColor: m.zona.color }}></div>
-                          <strong className={estaOcupada ? 'line-through' : ''}>M{m.id}</strong> 
+                          <strong className={estaOcupada ? 'line-through' : ''}>M{m.id}</strong>
                           <span className={`${estaOcupada ? 'line-through' : ''} text-xs font-normal opacity-70`}>{m.capacidad}p</span>
                         </button>
                       );
@@ -560,7 +546,7 @@ export default function AdminPanel() {
               <div className="flex gap-3 pt-3">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 text-sm font-semibold text-gray-600 bg-white border border-gray-200 rounded-xl hover:bg-gray-50">Cancelar</button>
                 <button type="submit" disabled={!modalForm.mesa_id || isSubmittingReserva} className="flex-[2] py-3 text-sm font-bold text-white bg-[#534AB7] border border-transparent rounded-xl hover:bg-[#3C3489] shadow-md disabled:opacity-50 transition-all flex items-center justify-center gap-2">
-                  {isSubmittingReserva ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/> : <CheckCircle2 size={16}/>} Confirma{isSubmittingReserva ? 'ndo' : 'r'}
+                  {isSubmittingReserva ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <CheckCircle2 size={16} />} Confirma{isSubmittingReserva ? 'ndo' : 'r'}
                 </button>
               </div>
             </form>
@@ -568,9 +554,67 @@ export default function AdminPanel() {
         </div>
       )}
 
+      {/* Nuevo Modal de Detalles de Mesa */}
+      {selectedTableId !== null && activeTab === 'turnos' && (
+        <div className="fixed inset-0 bg-gray-900/60 flex items-center justify-center p-4 z-[60] backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl border border-gray-200 w-full max-w-[420px] shadow-2xl overflow-hidden flex flex-col relative">
+            <div className="p-5 md:p-6 border-b border-gray-100 flex items-center justify-between shrink-0 bg-gray-50">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 leading-tight">Mesa {selectedTableId}</h3>
+                <p className="text-xs text-indigo-600 font-semibold mt-1 uppercase tracking-wide">
+                  {getZonaDeMesa(selectedTableId)?.nombre || 'Sin Zona'} • Capacidad {mesasVisuales.find(m => m.id === selectedTableId)?.capacidad}pax
+                </p>
+              </div>
+              <button onClick={() => setSelectedTableId(null)} className="text-gray-400 hover:text-gray-700 bg-white shadow-sm p-1.5 rounded-full border border-gray-200 transition-colors hover:bg-gray-100"><XCircle size={20} /></button>
+            </div>
+            
+            <div className="p-6 md:p-7 max-h-[70vh] overflow-y-auto bg-white">
+              {getReservasEnMesa(selectedTableId).length === 0 ? (
+                <div className="flex flex-col gap-4 text-center items-center py-4">
+                  <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-1">
+                    <CheckCircle2 size={32} className="text-green-500" />
+                  </div>
+                  <div>
+                    <h4 className="text-gray-900 font-bold text-lg">Mesa libre</h4>
+                    <p className="text-gray-500 text-sm mt-1">Disponible para el turno actual</p>
+                  </div>
+                  <button onClick={() => { setSelectedTableId(null); openModal(selectedTableId); }} className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                    <Plus size={18} /> Asignar Reserva
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Reservas Asignadas</h4>
+                  {getReservasEnMesa(selectedTableId).map(r => (
+                    <div key={r.id} className="bg-gray-50 border border-gray-200 rounded-2xl p-5 flex flex-col relative overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                      <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: getZonaDeMesa(r.mesa_id || 0)?.color }}></div>
+                      <div className="flex justify-between items-start ml-2">
+                        <div>
+                          <p className="font-bold text-gray-900 text-lg leading-tight">{r.nombre}</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="bg-white border border-gray-200 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-md">{r.personas} pax</span>
+                            <span className="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-md">{r.hora_inicio} hs</span>
+                          </div>
+                        </div>
+                        <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Confirmada</span>
+                      </div>
+                      <div className="mt-5 ml-2 border-t border-gray-200 pt-4 flex">
+                        <button onClick={() => { handleDeleteReserva(r.id); setSelectedTableId(null); }} className="w-full text-xs text-red-600 hover:text-white hover:bg-red-500 hover:border-red-500 font-bold px-4 py-2.5 rounded-xl border border-red-200 transition-all flex items-center justify-center gap-2">
+                          <Trash2 size={14} /> Liberar Mesa
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {toastMessage && (
         <div className="fixed top-6 right-6 md:top-auto md:bottom-10 md:right-10 px-5 py-3.5 bg-green-600 text-white font-semibold rounded-2xl shadow-xl z-50 animate-in slide-in-from-top-4 md:slide-in-from-bottom-4 fade-in duration-300 flex items-center gap-3">
-          <CheckCircle2 size={18}/> <span>{toastMessage}</span>
+          <CheckCircle2 size={18} /> <span>{toastMessage}</span>
         </div>
       )}
     </div>
