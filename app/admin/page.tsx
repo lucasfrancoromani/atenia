@@ -44,6 +44,7 @@ export default function AdminPanel() {
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const [zonaFiltro, setZonaFiltro] = useState<string>('todas');
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
+  const [horaSnapshot, setHoraSnapshot] = useState<string | null>(null);
 
   // Estados Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -111,6 +112,23 @@ export default function AdminPanel() {
     fetchHistorial();
   }, []);
 
+  // Time Utility
+  const timeToMinutes = (h: string) => {
+    const [hrs, mins] = h.split(':').map(Number);
+    return hrs * 60 + mins || 0;
+  };
+
+  const isMesaLibreEnHora = (id: number, hora: string) => {
+    const t = timeToMinutes(hora);
+    return !reservas
+      .filter(r => (r.estado === 'confirmada' || r.estado === 'pendiente') && r.fecha === fechaFiltro && r.mesa_id === id)
+      .some(r => {
+        const start = timeToMinutes(r.hora_inicio);
+        const end = r.hora_fin ? timeToMinutes(r.hora_fin) : start + 120; // fallback 2h
+        return t >= start && t < end;
+      });
+  };
+
   // Helper de Mesas All
   const mesasVisuales = zonas.flatMap(z => z.mesas.map(m => ({ ...m, zona: z })));
   const getZonaDeMesa = (resId: number) => mesasVisuales.find(m => m.id === resId)?.zona;
@@ -168,8 +186,15 @@ export default function AdminPanel() {
     return mapeoReservas.filter(m => m.mesaIds.includes(resId)).map(m => m.res);
   };
 
-  // Stats
-  const mesasOcupadasIds = new Set(mapeoReservas.flatMap(m => m.mesaIds));
+  // Stats Dinámicas
+  const getHoraActualStr = () => {
+    if (horaSnapshot) return horaSnapshot;
+    return currentTime ? currentTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '00:00';
+  };
+
+  const currentViewTime = getHoraActualStr();
+  const mesasOcupadasIds = new Set(mesasVisuales.filter(m => !isMesaLibreEnHora(m.id, currentViewTime)).map(m => m.id));
+
   const paxDelTurno = reservasDelTurno.reduce((sum, r) => sum + (r.personas || 0), 0);
   const totalMesas = mesasVisuales.length;
   const ocupadas = mesasOcupadasIds.size;
@@ -365,6 +390,20 @@ export default function AdminPanel() {
                     onChange={(e) => { setFechaFiltro(e.target.value); setSelectedTableId(null); }}
                     className="text-sm font-bold text-gray-700 bg-transparent outline-none cursor-pointer"
                   />
+                </div>
+
+                {/* NUEVO: SELECTOR DE HORA VISTA */}
+                <div className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-1.5 rounded-xl shadow-sm focus-within:ring-2 focus-within:ring-[#534AB7] transition-all">
+                  <Clock size={16} className={horaSnapshot ? "text-indigo-600" : "text-gray-400"} />
+                  <input
+                    type="time"
+                    value={horaSnapshot || (currentTime ? currentTime.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '20:00')}
+                    onChange={(e) => setHoraSnapshot(e.target.value)}
+                    className={`text-sm font-bold bg-transparent outline-none cursor-pointer ${horaSnapshot ? "text-indigo-700" : "text-gray-400"}`}
+                  />
+                  {horaSnapshot && (
+                    <button onClick={() => setHoraSnapshot(null)} className="text-[10px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded-md hover:bg-indigo-100 font-black uppercase">Real Time</button>
+                  )}
                 </div>
 
               </div>
@@ -733,18 +772,18 @@ export default function AdminPanel() {
                     <p className="text-xs text-red-500 font-medium py-2 px-3 bg-red-50 rounded-lg w-full">⚠️ No hay mesas {modalZonaPredef ? 'en esta zona ' : ''}con capacidad para {modalForm.personas} pax.</p>
                   ) : (
                     mesasVisuales.filter(m => m.capacidad >= modalForm.personas && (!modalZonaPredef || m.zona.id === modalZonaPredef)).map(m => {
-                      const estaOcupada = mesasOcupadasIds.has(m.id);
+                      const estaOcupada = !isMesaLibreEnHora(m.id, modalForm.hora_inicio);
                       const isSelected = modalForm.mesa_id === m.id;
                       return (
                         <button
                           key={m.id} type="button" disabled={estaOcupada}
                           onClick={() => setModalForm({ ...modalForm, mesa_id: m.id })}
                           className={`px-3 py-2 rounded-xl border text-sm transition-all text-left flex gap-1.5 items-center
-                            ${estaOcupada ? 'opacity-50 cursor-not-allowed bg-gray-50 border-gray-200 text-gray-500'
-                              : isSelected ? 'bg-indigo-50 border-[#534AB7] text-[#3e1b55] font-bold shadow-sm ring-1 ring-[#534AB7]'
+                            ${estaOcupada ? 'opacity-40 cursor-not-allowed bg-gray-50 border-gray-200 text-gray-500'
+                              : isSelected ? 'bg-indigo-50 border-[#534AB7] text-[#3e1b55] font-bold shadow-sm ring-2 ring-[#534AB7]'
                                 : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'}`}
                         >
-                          <div className={`w-2 h-2 rounded-full ${estaOcupada ? 'opacity-50' : ''}`} style={{ backgroundColor: m.zona.color }}></div>
+                          <div className={`w-2.5 h-2.5 rounded-full ${estaOcupada ? 'opacity-40' : ''}`} style={{ backgroundColor: m.zona.color }}></div>
                           <strong className={estaOcupada ? 'line-through' : ''}>M{m.id}</strong>
                           <span className={`${estaOcupada ? 'line-through' : ''} text-xs font-normal opacity-70`}>{m.capacidad}p</span>
                         </button>
