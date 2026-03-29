@@ -15,6 +15,7 @@ type Reserva = {
   id: number | string;
   fecha: string;
   hora_inicio: string;
+  hora_fin?: string;
   personas: number;
   estado: string;
   nombre?: string;
@@ -34,8 +35,11 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  // Estado para la fecha seleccionada (Por defecto: Hoy)
+  const [fechaFiltro, setFechaFiltro] = useState<string>(() => new Date().toISOString().split('T')[0]);
+
   // Estados Operativos
-  const [activeTab, setActiveTab] = useState<'turnos' | 'mesas' | 'estadisticas'>('turnos');
+  const [activeTab, setActiveTab] = useState<'turnos' | 'mesas' | 'estadisticas' | 'historial'>('turnos');
   const [turno, setTurno] = useState<'mediodia' | 'noche'>('noche');
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const [zonaFiltro, setZonaFiltro] = useState<string>('todas');
@@ -94,6 +98,19 @@ export default function AdminPanel() {
     fetchData();
   }, []);
 
+  // Fetch historial de reservas expiradas
+  const [historial, setHistorial] = useState<Reserva[]>([]);
+  const [loadingHistorial, setLoadingHistorial] = useState(true);
+  useEffect(() => {
+    async function fetchHistorial() {
+      const { data, error } = await supabase.from('reservas_historial').select('*');
+      if (error) console.error('Error fetching historial:', error);
+      else setHistorial(data || []);
+      setLoadingHistorial(false);
+    }
+    fetchHistorial();
+  }, []);
+
   // Helper de Mesas All
   const mesasVisuales = zonas.flatMap(z => z.mesas.map(m => ({ ...m, zona: z })));
   const getZonaDeMesa = (resId: number) => mesasVisuales.find(m => m.id === resId)?.zona;
@@ -102,6 +119,8 @@ export default function AdminPanel() {
 
   const reservasDelTurno = reservas
     .filter(r => r.estado === 'confirmada' || r.estado === 'pendiente')
+    // MAGIA: Filtramos para que solo muestre las del día seleccionado
+    .filter(r => r.fecha === fechaFiltro)
     .filter(r => turno === 'mediodia' ? isMediodia(r.hora_inicio) : !isMediodia(r.hora_inicio));
 
   // Asignación Dinámica Multimesa (UX Frontend Tetris)
@@ -114,30 +133,30 @@ export default function AdminPanel() {
 
     // Priorizamos mesa_id original si existe
     if (res.mesa_id) {
-       asignadas.push(res.mesa_id);
-       let mCap = mesasVisuales.find(m => m.id === res.mesa_id)?.capacidad || 0;
-       pRes -= mCap;
-       cloneVisuales = cloneVisuales.filter(m => m.id !== res.mesa_id);
+      asignadas.push(res.mesa_id);
+      let mCap = mesasVisuales.find(m => m.id === res.mesa_id)?.capacidad || 0;
+      pRes -= mCap;
+      cloneVisuales = cloneVisuales.filter(m => m.id !== res.mesa_id);
     }
 
     // Si aún sobran personas (grupo grande o IA no asignó mesa_id)
-    while(pRes > 0 && cloneVisuales.length > 0) {
-       const zIdTarget = res.zona_id || (res.mesa_id ? mesasVisuales.find(m => m.id === res.mesa_id)?.zona.id : null);
-       let candidatas = cloneVisuales.filter(m => !zIdTarget || m.zona.id === zIdTarget);
-       if(candidatas.length === 0) candidatas = cloneVisuales;
+    while (pRes > 0 && cloneVisuales.length > 0) {
+      const zIdTarget = res.zona_id || (res.mesa_id ? mesasVisuales.find(m => m.id === res.mesa_id)?.zona.id : null);
+      let candidatas = cloneVisuales.filter(m => !zIdTarget || m.zona.id === zIdTarget);
+      if (candidatas.length === 0) candidatas = cloneVisuales;
 
-       candidatas.sort((a,b) => a.capacidad - b.capacidad);
-       let elegida = candidatas.find(m => m.capacidad >= pRes) || candidatas[candidatas.length - 1];
+      candidatas.sort((a, b) => a.capacidad - b.capacidad);
+      let elegida = candidatas.find(m => m.capacidad >= pRes) || candidatas[candidatas.length - 1];
 
-       if(elegida) {
-           asignadas.push(elegida.id);
-           pRes -= elegida.capacidad;
-           cloneVisuales = cloneVisuales.filter(m => m.id !== elegida.id);
-       } else {
-           break;
-       }
+      if (elegida) {
+        asignadas.push(elegida.id);
+        pRes -= elegida.capacidad;
+        cloneVisuales = cloneVisuales.filter(m => m.id !== elegida.id);
+      } else {
+        break;
+      }
     }
-    
+
     // Solo asignamos mesa si realmente se procesó
     const fallbackId = asignadas.length > 0 ? asignadas[0] : (mesasVisuales[0]?.id || 1);
     mapeoReservas.push({ res: { ...res, mesa_id: res.mesa_id || fallbackId }, mesaIds: asignadas });
@@ -173,9 +192,9 @@ export default function AdminPanel() {
     if (!modalForm.nombre || !modalForm.mesa_id) return;
     setIsSubmittingReserva(true);
 
-    const hoy = new Date().toISOString().split('T')[0];
     const [h, m] = modalForm.hora_inicio.split(':');
-    const hora_fin = `${(parseInt(h) + 2).toString().padStart(2, '0')}:${m}`;
+    let endH = parseInt(h) + 2;
+    const hora_fin = endH >= 24 ? "23:59" : `${endH.toString().padStart(2, '0')}:${m}`;
 
     const zonaIdCorrecta = getZonaDeMesa(modalForm.mesa_id)?.id || 'z1';
 
@@ -184,7 +203,7 @@ export default function AdminPanel() {
       personas: modalForm.personas,
       hora_inicio: modalForm.hora_inicio,
       hora_fin: hora_fin,
-      fecha: hoy,
+      fecha: fechaFiltro,
       estado: 'confirmada',
       mesa_id: modalForm.mesa_id,
       zona_id: zonaIdCorrecta
@@ -196,6 +215,11 @@ export default function AdminPanel() {
     if (error) alert("Error: " + error.message);
     else if (inserted && inserted.length > 0) {
       setReservas([...reservas, inserted[0]]);
+      
+      // Auto-cambio de pestaña según el horario de la reserva
+      const newTurno = isMediodia(nuevaReserva.hora_inicio) ? 'mediodia' : 'noche';
+      setTurno(newTurno);
+      
       showToast(`Reserva confirmada: ${modalForm.nombre} en Mesa ${nuevaReserva.mesa_id}`);
       setIsModalOpen(false);
     }
@@ -208,6 +232,16 @@ export default function AdminPanel() {
       setReservas(reservas.filter(r => r.id !== id));
       showToast('Reserva cancelada correctamente');
     } else alert("Error: " + error.message);
+  };
+
+  // Delete historial entry
+  const handleDeleteHistorial = async (id: number | string) => {
+    if (!confirm('¿Eliminar este registro del historial?')) return;
+    const { error } = await supabase.from('reservas_historial').delete().eq('id', id);
+    if (!error) {
+      setHistorial(historial.filter(r => r.id !== id));
+      showToast('Registro del historial eliminado');
+    } else alert('Error: ' + error.message);
   };
 
   // UI Helpers Sillas
@@ -303,17 +337,39 @@ export default function AdminPanel() {
         <button onClick={() => { setActiveTab('turnos'); setSelectedTableId(null); }} className={`py-3 px-4 text-sm font-medium transition-colors border-b-2 flex items-center gap-2 ${activeTab === 'turnos' ? 'border-[#534AB7] text-[#534AB7]' : 'border-transparent text-gray-500 hover:text-gray-900'}`}><LayoutDashboard size={16} /> Operativos de Salón</button>
         <button onClick={() => setActiveTab('mesas')} className={`py-3 px-4 text-sm font-medium transition-colors border-b-2 flex items-center gap-2 ${activeTab === 'mesas' ? 'border-[#534AB7] text-[#534AB7]' : 'border-transparent text-gray-500 hover:text-gray-900'}`}><Map size={16} /> Configuración de Zonas</button>
         <button onClick={() => setActiveTab('estadisticas')} className={`py-3 px-4 text-sm font-medium transition-colors border-b-2 flex items-center gap-2 ${activeTab === 'estadisticas' ? 'border-[#534AB7] text-[#534AB7]' : 'border-transparent text-gray-500 hover:text-gray-900'}`}><TrendingUp size={16} /> Analíticas</button>
+          <button onClick={() => setActiveTab('historial')} className={`py-3 px-4 text-sm font-medium transition-colors border-b-2 flex items-center gap-2 ${activeTab === 'historial' ? 'border-[#534AB7] text-[#534AB7]' : 'border-transparent text-gray-500 hover:text-gray-900'}`}><Clock size={16} /> Historial</button>
       </div>
 
       <div className="flex-1 overflow-hidden flex flex-col">
         {activeTab === 'turnos' && (
           <div className="flex-1 flex flex-col overflow-hidden animate-in fade-in duration-300">
-            <div className="bg-white border-b border-gray-200 px-4 md:px-6 py-2 flex items-center justify-between gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
-              <div className="flex items-center gap-4">
-                <button onClick={() => { setTurno('mediodia'); setSelectedTableId(null); }} className={`py-2 px-5 rounded-full text-sm font-medium transition-all flex items-center gap-2 shadow-sm border ${turno === 'mediodia' ? 'bg-[#534AB7] text-white border-[#534AB7]' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}><Sun size={14} className={turno === 'mediodia' ? 'text-yellow-300' : 'text-yellow-500'} /> Mediodía (13:00 - 15:30)</button>
-                <button onClick={() => { setTurno('noche'); setSelectedTableId(null); }} className={`py-2 px-5 rounded-full text-sm font-medium transition-all flex items-center gap-2 shadow-sm border ${turno === 'noche' ? 'bg-[#534AB7] text-white border-[#534AB7]' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}><Moon size={14} className={turno === 'noche' ? 'text-indigo-200' : 'text-[#3e1b55]'} /> Noche (20:00 - 23:00)</button>
+
+            {/* ESTE ES EL BLOQUE QUE CAMBIA: */}
+            <div className="bg-white border-b border-gray-200 px-4 md:px-6 py-3 flex items-center justify-between gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
+              <div className="flex items-center gap-3">
+
+                {/* BOTONES DE TURNO */}
+                <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-full">
+                  <button onClick={() => { setTurno('mediodia'); setSelectedTableId(null); }} className={`py-1.5 px-4 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${turno === 'mediodia' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}><Sun size={14} className={turno === 'mediodia' ? 'text-yellow-500' : ''} /> Mediodía</button>
+                  <button onClick={() => { setTurno('noche'); setSelectedTableId(null); }} className={`py-1.5 px-4 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 ${turno === 'noche' ? 'bg-[#534AB7] text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}><Moon size={14} className={turno === 'noche' ? 'text-indigo-200' : ''} /> Noche</button>
+                </div>
+
+                <div className="w-px h-6 bg-gray-200 mx-1 hidden md:block"></div>
+
+                {/* NUEVO: SELECTOR DE FECHA */}
+                <div className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-1.5 rounded-xl shadow-sm focus-within:ring-2 focus-within:ring-[#534AB7] transition-all">
+                  <CalendarCheck size={16} className="text-[#534AB7]" />
+                  <input
+                    type="date"
+                    value={fechaFiltro}
+                    onChange={(e) => { setFechaFiltro(e.target.value); setSelectedTableId(null); }}
+                    className="text-sm font-bold text-gray-700 bg-transparent outline-none cursor-pointer"
+                  />
+                </div>
+
               </div>
-              <button onClick={() => openModal()} className="py-2 px-4 rounded-xl text-sm font-bold bg-[#534AB7] text-white hover:bg-[#3C3489] hover:shadow-md transition-all flex items-center gap-2 border border-transparent">
+
+              <button onClick={() => openModal()} className="py-2.5 px-5 rounded-xl text-sm font-bold bg-[#534AB7] text-white hover:bg-[#3C3489] hover:shadow-md transition-all flex items-center gap-2">
                 <Plus size={16} /> Nueva Reserva
               </button>
             </div>
@@ -370,7 +426,7 @@ export default function AdminPanel() {
                               <p className="text-sm font-semibold text-gray-900 truncate">{r.nombre}</p>
                               <span className="text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap opacity-80" style={{ backgroundColor: zona?.color ? `${zona.color}20` : '#e2e8f0', color: zona?.color }}>M {r.mesa_id}</span>
                             </div>
-                            <p className="text-[11px] text-gray-500">{r.personas}pax • {r.hora_inicio} • {zona?.nombre}</p>
+                            <p className="text-[11px] text-gray-500">{r.personas}pax • {r.hora_inicio}-{r.hora_fin?.substring(0,5) || '...'} • {zona?.nombre}</p>
                           </div>
                         )
                       })}
@@ -521,6 +577,120 @@ export default function AdminPanel() {
           </div>
         )}
 
+        {/* Historial */}
+        {activeTab === 'historial' && (
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-10 animate-in fade-in bg-white max-w-6xl mx-auto w-full">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Historial de Reservas</h2>
+                <p className="text-gray-500 mt-1">Consulta y gestiona las reservas que ya han finalizado.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                 <div className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-1.5 rounded-xl shadow-sm">
+                  <CalendarCheck size={16} className="text-[#534AB7]" />
+                  <input
+                    type="date"
+                    value={fechaFiltro}
+                    onChange={(e) => setFechaFiltro(e.target.value)}
+                    className="text-sm font-bold text-gray-700 bg-transparent outline-none cursor-pointer"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 flex flex-col">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Archivadas</span>
+                <span className="text-2xl font-black text-[#534AB7]">{historial.length}</span>
+              </div>
+              <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 flex flex-col">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Pax Histórico</span>
+                <span className="text-2xl font-black text-amber-600">{historial.reduce((sum, r) => sum + (r.personas || 0), 0)}</span>
+              </div>
+              <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 flex flex-col">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Filtradas por Fecha</span>
+                <span className="text-2xl font-black text-indigo-600">{historial.filter(r => r.fecha === fechaFiltro).length}</span>
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden">
+              <div className="overflow-x-auto whitespace-nowrap">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50/80 border-b border-gray-100">
+                      <th className="px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest">Cliente</th>
+                      <th className="px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">Fecha</th>
+                      <th className="px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">Horario</th>
+                      <th className="px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">Pax</th>
+                      <th className="px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-center">Mesa / Zona</th>
+                      <th className="px-6 py-4 text-[11px] font-black text-gray-400 uppercase tracking-widest text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {loadingHistorial ? (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-12 text-center">
+                           <div className="flex flex-col items-center gap-2">
+                             <div className="w-6 h-6 border-2 border-[#534AB7]/20 border-t-[#534AB7] rounded-full animate-spin" />
+                             <p className="text-sm text-gray-400 font-medium italic">Cargando historial...</p>
+                           </div>
+                        </td>
+                      </tr>
+                    ) : historial.filter(r => r.fecha === fechaFiltro).length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-12 text-center text-gray-400 italic font-medium">Sin registros archivados para esta fecha.</td>
+                      </tr>
+                    ) : (
+                      historial
+                        .filter(r => r.fecha === fechaFiltro)
+                        .sort((a, b) => b.hora_inicio.localeCompare(a.hora_inicio))
+                        .map((r) => {
+                          const zona = getZonaDeMesa(r.mesa_id || 0);
+                          return (
+                            <tr key={r.id} className="hover:bg-gray-50/30 transition-colors">
+                              <td className="px-6 py-4">
+                                <div className="flex flex-col">
+                                  <span className="font-bold text-gray-900 text-sm">{r.nombre || 'Sin nombre'}</span>
+                                  <span className="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Reserva #{r.id}</span>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                <span className="text-sm font-semibold text-gray-600">{r.fecha}</span>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-black bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200/50">
+                                  {r.hora_inicio} - {r.hora_fin || '—'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                <span className="text-sm font-bold text-gray-700">{r.personas}p</span>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                <div className="flex items-center justify-center gap-2">
+                                  <span className="text-xs font-black text-gray-900">M{r.mesa_id}</span>
+                                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-black uppercase tracking-tight">{zona?.nombre || 'General'}</span>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <button
+                                  onClick={() => handleDeleteHistorial(r.id)}
+                                  className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                  title="Eliminar permanentemente"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
 
       {isModalOpen && (
@@ -548,9 +718,12 @@ export default function AdminPanel() {
 
               <div>
                 <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-1.5">Hora</label>
-                <select value={modalForm.hora_inicio} onChange={(e) => setModalForm({ ...modalForm, hora_inicio: e.target.value })} className="w-full text-sm font-medium p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#534AB7] focus:outline-none bg-white">
-                  {HORAS[turno].map(h => <option key={h} value={h}>{h} hs</option>)}
-                </select>
+                <input 
+                  type="time" 
+                  value={modalForm.hora_inicio} 
+                  onChange={(e) => setModalForm({ ...modalForm, hora_inicio: e.target.value })} 
+                  className="w-full text-sm font-medium p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#534AB7] focus:outline-none bg-white font-sans"
+                />
               </div>
 
               <div className="pt-2 border-t border-gray-100">
@@ -605,7 +778,7 @@ export default function AdminPanel() {
               </div>
               <button onClick={() => setSelectedTableId(null)} className="text-gray-400 hover:text-gray-700 bg-white shadow-sm p-1.5 rounded-full border border-gray-200 transition-colors hover:bg-gray-100"><XCircle size={20} /></button>
             </div>
-            
+
             <div className="p-6 md:p-7 max-h-[70vh] overflow-y-auto bg-white">
               {getReservasEnMesa(selectedTableId).length === 0 ? (
                 <div className="flex flex-col gap-4 text-center items-center py-4">
@@ -631,7 +804,7 @@ export default function AdminPanel() {
                           <p className="font-bold text-gray-900 text-lg leading-tight">{r.nombre}</p>
                           <div className="flex items-center gap-2 mt-2">
                             <span className="bg-white border border-gray-200 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-md">{r.personas} pax</span>
-                            <span className="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-md">{r.hora_inicio} hs</span>
+                            <span className="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-md">{r.hora_inicio} - {r.hora_fin?.substring(0,5)} hs</span>
                           </div>
                         </div>
                         <span className="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">Confirmada</span>
